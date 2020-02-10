@@ -1,0 +1,154 @@
+version: "3"
+services:
+  bnk-data:
+    container_name: bnk-data
+    build: ./bnk-data
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: bnk
+      MYSQL_USER: trucker
+      MYSQL_PASSWORD: trucker
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - local
+  bnk-api-vendor:
+    container_name: bnk-api-vendor
+    build: ./bnk-api/bnk-api-vendor
+    restart: always
+    expose:
+      - 8081
+    ports:
+      - 8081:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    depends_on:
+      - bnk-data
+  bnk-api-category:
+    container_name: bnk-api-category
+    build: ./bnk-api/bnk-api-category
+    restart: always
+    expose:
+      - 8082
+    ports:
+      - 8082:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    depends_on:
+      - bnk-data
+  bnk-api-party:
+    container_name: bnk-api-party
+    build: ./bnk-api/bnk-api-party
+    restart: always
+    expose:
+      - 8083
+    ports:
+      - 8083:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+      - vendor.api.uri=http://bnk-api-vendor:8080/vendors
+      - category.api.uri=http://bnk-api-category:8080/categories
+    depends_on:
+      - bnk-data
+      - bnk-api-vendor
+      - bnk-api-category
+  bnk-api-customer:
+    container_name: bnk-api-customer
+    build: ./bnk-api/bnk-api-customer
+    restart: always
+    expose:
+      - 8084
+    ports:
+      - 8084:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    depends_on:
+      - bnk-data
+  bnk-api-bank:
+    container_name: bnk-api-bank
+    build: ./bnk-api/bnk-api-bank
+    restart: always
+    expose:
+      - 8085
+    ports:
+      - 8085:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    depends_on:
+      - bnk-data
+  bnk-api-account:
+    container_name: bnk-api-account
+    build: ./bnk-api/bnk-api-account
+    restart: always
+    expose:
+      - 8086
+    ports:
+      - 8086:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+      - customer.api.uri=http://bnk-api-customer:8080/customers
+      - bank.api.uri=http://bnk-api-bank:8080/banks
+    depends_on:
+      - bnk-data
+      - bnk-api-customer
+      - bnk-api-bank
+  bnk-api-transaction:
+    container_name: bnk-api-transaction
+    build: ./bnk-api/bnk-api-transaction
+    restart: always
+    expose:
+      - 8087
+    ports:
+      - 8087:8080
+    networks:
+      - local
+    environment:
+      - spring.datasource.url=jdbc:mysql://bnk-data:3306/bnk
+      - spring.datasource.username=trucker
+      - spring.datasource.password=trucker
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+      - party.api.uri=http://bnk-api-party:8080/parties
+      - account.api.uri=http://bnk-api-account:8080/accounts
+    depends_on:
+      - bnk-data
+      - bnk-api-party
+      - bnk-api-account
+volumes:
+  db-data:
+networks:
+  local:
+    driver: bridge
