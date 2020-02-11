@@ -16,6 +16,18 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - local
+  bnk-config:
+    container_name: bnk-config
+    build: ./bnk-config
+    restart: always
+    expose:
+      - 8888
+    ports:
+      - 8888:8080
+    networks:
+      - local
+    environment:
+      - spring.cloud.config.server.git.uri=https://github.com/ross-stockman/demo-config.git
   bnk-api-vendor:
     container_name: bnk-api-vendor
     build: ./bnk-api/bnk-api-vendor
