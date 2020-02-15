@@ -7,19 +7,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.tomcat.util.buf.StringUtils;
 import org.rstockman.bnk.api.vendor.dto.VendorRequestParams;
-import org.rstockman.bnk.api.vendor.dto.VendorResult;
+import org.rstockman.bnk.api.vendor.dto.VendorResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public class VendorDAO implements SimpleDAO<VendorResult, VendorRequestParams, String> {
+import lombok.extern.slf4j.Slf4j;
 
-	private static final Map<String, VendorResult> MAP = new HashMap<>();
+@Repository
+@Slf4j
+public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams, String> {
+
+	private static final Map<String, VendorResource> MAP = new HashMap<>();
 
 	private static final List<String> DEFAULT_COLUMNS = Arrays.asList("_key", "_version", "_created", "_updated", "id",
 			"name");
@@ -28,15 +34,29 @@ public class VendorDAO implements SimpleDAO<VendorResult, VendorRequestParams, S
 	private JdbcTemplate jdbcTemplate;
 
 	@Override
-	public Optional<VendorResult> get(String key) {
-		return Optional.ofNullable(MAP.get(key));
+	public Optional<VendorResource> get(String key) {
+		try {
+			return Optional.of(jdbcTemplate.queryForObject("select * from vendor where _key = ?", (rs, rowNum) -> {
+				return VendorResource.builder().key(rs.getString("_key")).version(rs.getString("_version"))
+						.created(rs.getTimestamp("_created")).updated(rs.getTimestamp("_updated")).id(rs.getLong("id"))
+						.name(rs.getString("name")).build();
+			}, key));
+		} catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		} catch (IncorrectResultSizeDataAccessException e) {
+			log.warn("There should be 1 or 0 rows with this _key=" + key + " but more records were found.", e);
+			return Optional.empty();
+		}
 	}
 
 	@Override
-	public List<VendorResult> getAll(VendorRequestParams params) {
+	public List<VendorResource> getAll(VendorRequestParams params) {
 		var columns = resolveColumns(params);
-		return jdbcTemplate.query("select " + (StringUtils.join(columns)) + " from vendor", (rs, rowNum) -> {
-			var builder = VendorResult.builder();
+		var sorts = resolveSorts(params);
+		var query = "select " + (StringUtils.join(columns)) + " from vendor" + sorts;
+		log.info(query);
+		return jdbcTemplate.query(query, (rs, rowNum) -> {
+			var builder = VendorResource.builder();
 			if (columns.contains("_key")) {
 				builder = builder.key(rs.getString("_key"));
 			}
@@ -67,15 +87,32 @@ public class VendorDAO implements SimpleDAO<VendorResult, VendorRequestParams, S
 		}
 	}
 
+	private String resolveSorts(VendorRequestParams params) {
+		if (Objects.isNull(params.getSort())) {
+			return " ";
+		} else {
+			return " ORDER BY "
+					+ String.join(",", Arrays.asList(params.getSort().trim().split("\\s*,\\s*")).stream().map(s -> {
+						if (s.startsWith("-")) {
+							return s.substring(1) + " DESC ";
+						} else if (s.startsWith("+")) {
+							return s.substring(1) + " ASC ";
+						} else {
+							return s;
+						}
+					}).collect(Collectors.toList()));
+		}
+	}
+
 	@Override
-	public String create(VendorResult obj) {
+	public String create(VendorResource obj) {
 		var key = UUID.randomUUID().toString();
 		MAP.put(key, obj);
 		return key;
 	}
 
 	@Override
-	public void put(String key, VendorResult obj) {
+	public void put(String key, VendorResource obj) {
 		MAP.put(key, obj);
 	}
 

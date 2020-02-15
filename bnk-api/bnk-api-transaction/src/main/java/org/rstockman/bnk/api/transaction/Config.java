@@ -8,10 +8,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class Config {
 
-	@Value("${party.api.uri}")
+	@Value("${bnk.api.party.uri}")
 	private String partyUrl;
 
-	@Value("${account.api.uri}")
+	@Value("${bnk.api.account.uri}")
 	private String accountUrl;
 
 	@Bean

@@ -1,6 +1,6 @@
 package org.rstockman.bnk.api.vendor.dto;
 
-import org.rstockman.bnk.common.dto.StandardResultDTO;
+import org.rstockman.bnk.common.dto.StandardResourceDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(Include.NON_NULL)
-public class VendorResult extends StandardResultDTO {
+public class VendorResource extends StandardResourceDTO {
 	private Long id;
 	private String name;
 }

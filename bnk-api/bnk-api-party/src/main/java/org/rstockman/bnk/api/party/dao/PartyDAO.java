@@ -26,10 +26,10 @@ public class PartyDAO implements SimpleDAO<PartyResult, PartyRequestParams, Stri
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Value("${vendor.api.uri}")
+	@Value("${bnk.api.vendor.uri}")
 	private String vendorUrl;
 
-	@Value("${category.api.uri}")
+	@Value("${bnk.api.category.uri}")
 	private String categoryUrl;
 
 	@Autowired

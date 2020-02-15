@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.rstockman.bnk.common.dto.StandardRequestParamsDTO;
-import org.rstockman.bnk.common.dto.StandardResultDTO;
+import org.rstockman.bnk.common.dto.StandardResourceDTO;
 
-public interface SimpleDAO<T extends StandardResultDTO, P extends StandardRequestParamsDTO, K> {
+public interface SimpleDAO<T extends StandardResourceDTO, P extends StandardRequestParamsDTO, K> {
 
 	Optional<T> get(K key);
 

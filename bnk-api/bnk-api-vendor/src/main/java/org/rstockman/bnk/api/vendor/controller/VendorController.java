@@ -3,7 +3,7 @@ package org.rstockman.bnk.api.vendor.controller;
 import java.util.List;
 
 import org.rstockman.bnk.api.vendor.dto.VendorRequestParams;
-import org.rstockman.bnk.api.vendor.dto.VendorResult;
+import org.rstockman.bnk.api.vendor.dto.VendorResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
 import org.rstockman.bnk.common.exceptions.ExceptionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/vendors")
-public class VendorResource {
+public class VendorController {
 
 	@Autowired
-	private SimpleDAO<VendorResult, VendorRequestParams, String> dao;
+	private SimpleDAO<VendorResource, VendorRequestParams, String> dao;
 
 	@GetMapping("/{id}")
-	public VendorResult getVendor(@PathVariable String id) {
+	public VendorResource getVendor(@PathVariable String id) {
 		var obj = dao.get(id);
 		if (obj.isEmpty()) {
 			throw ExceptionFactory.resourceNotFound();
@@ -33,17 +33,17 @@ public class VendorResource {
 	}
 
 	@GetMapping
-	public List<VendorResult> getAll(VendorRequestParams params) {
+	public List<VendorResource> getAll(VendorRequestParams params) {
 		return dao.getAll(params);
 	}
 
 	@PostMapping
-	public String create(@RequestBody VendorResult obj) {
+	public String create(@RequestBody VendorResource obj) {
 		return dao.create(obj);
 	}
 
 	@PutMapping("/{id}")
-	public void put(@PathVariable String key, @RequestBody VendorResult obj) {
+	public void put(@PathVariable String key, @RequestBody VendorResource obj) {
 		dao.put(key, obj);
 	}
 

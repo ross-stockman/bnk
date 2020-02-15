@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
-public abstract class StandardResultDTO {
+public abstract class StandardResourceDTO {
 	@JsonProperty("_key")
 	private String key;
 	@JsonProperty("_version")

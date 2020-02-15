@@ -23,10 +23,10 @@ public class AccountDAO implements SimpleDAO<AccountResult, AccountRequestParams
 
 	private static final Map<String, AccountResult> MAP = new HashMap<>();
 
-	@Value("${bank.api.uri}")
+	@Value("${bnk.api.bank.uri}")
 	private String bankUrl;
 
-	@Value("${customer.api.uri}")
+	@Value("${bnk.api.customer.uri}")
 	private String customerUrl;
 
 	@Autowired

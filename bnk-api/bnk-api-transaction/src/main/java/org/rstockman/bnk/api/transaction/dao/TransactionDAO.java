@@ -23,10 +23,10 @@ public class TransactionDAO implements SimpleDAO<TransactionResult, TransactionR
 
 	private static final Map<String, TransactionResult> MAP = new HashMap<>();
 
-	@Value("${account.api.uri}")
+	@Value("${bnk.api.account.uri}")
 	private String accountUrl;
 
-	@Value("${party.api.uri}")
+	@Value("${bnk.api.party.uri}")
 	private String partyUrl;
 
 	@Autowired
