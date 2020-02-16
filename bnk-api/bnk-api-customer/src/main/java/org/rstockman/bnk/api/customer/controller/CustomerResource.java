@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerResource {
 
 	@Autowired
-	private SimpleDAO<CustomerResult, CustomerRequestParams, String> dao;
+	private SimpleDAO<CustomerResult, CustomerRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public CustomerResult get(@PathVariable String id) {

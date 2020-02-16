@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TransactionDAO implements SimpleDAO<TransactionResult, TransactionRequestParams, String> {
+public class TransactionDAO implements SimpleDAO<TransactionResult, TransactionRequestParams, String, String> {
 
 	private static final Map<String, TransactionResult> MAP = new HashMap<>();
 
@@ -60,6 +60,17 @@ public class TransactionDAO implements SimpleDAO<TransactionResult, TransactionR
 
 	@Override
 	public void put(String key, TransactionResult obj) {
+		if (Objects.nonNull(obj.getParty())) {
+			partyRestClient.get(obj.getParty().getId());
+		}
+		if (Objects.nonNull(obj.getAccount())) {
+			accountRestClient.get(obj.getAccount().getId());
+		}
+		MAP.put(key, obj);
+	}
+
+	@Override
+	public void put(String key, String version, TransactionResult obj) {
 		if (Objects.nonNull(obj.getParty())) {
 			partyRestClient.get(obj.getParty().getId());
 		}

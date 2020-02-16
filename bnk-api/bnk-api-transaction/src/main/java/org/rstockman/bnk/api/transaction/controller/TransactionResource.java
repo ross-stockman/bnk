@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TransactionResource {
 
 	@Autowired
-	private SimpleDAO<TransactionResult, TransactionRequestParams, String> dao;
+	private SimpleDAO<TransactionResult, TransactionRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public TransactionResult getTransaction(@PathVariable String id) {

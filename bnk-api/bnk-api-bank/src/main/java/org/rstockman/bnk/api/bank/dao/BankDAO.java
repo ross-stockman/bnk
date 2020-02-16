@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class BankDAO implements SimpleDAO<BankResult, BankRequestParams, String> {
+public class BankDAO implements SimpleDAO<BankResult, BankRequestParams, String, String> {
 
 	private static final Map<String, BankResult> MAP = new HashMap<>();
 
@@ -43,6 +43,11 @@ public class BankDAO implements SimpleDAO<BankResult, BankRequestParams, String>
 
 	@Override
 	public void put(String key, BankResult obj) {
+		MAP.put(key, obj);
+	}
+
+	@Override
+	public void put(String key, String version, BankResult obj) {
 		MAP.put(key, obj);
 	}
 

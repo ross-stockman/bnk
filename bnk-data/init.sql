@@ -1,63 +1,63 @@
 use bnk;
 CREATE TABLE vendor (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36) UNIQUE,
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   name VARCHAR(50)
 );
 CREATE TABLE category (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   name VARCHAR(50)
 );
 CREATE TABLE customer (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   name VARCHAR(50)
 );
 CREATE TABLE bank (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   name VARCHAR(50)
 );
 CREATE TABLE party (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
-  name VARCHAR(50), 
-  vendor_id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
+  name VARCHAR(50),
+  vendor_id BIGINT,
   category_id BIGINT
 );
 CREATE TABLE account (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   name VARCHAR(50),
   initial_balance DECIMAL(13,2),
   bank_id BIGINT,
   customer_id BIGINT
 );
 CREATE TABLE `transaction` (
-  _key VARCHAR(36), 
-  _version VARCHAR(36), 
-  _created DATETIME, 
-  _updated DATETIME, 
-  id BIGINT, 
+  _key VARCHAR(36),
+  _version VARCHAR(36),
+  _created DATETIME,
+  _updated DATETIME,
+  id BIGINT,
   trans_date DATETIME,
   check_num VARCHAR(20),
   description VARCHAR(200),
@@ -86,7 +86,7 @@ CREATE VIEW transaction_detail AS SELECT
   bank.name AS bank_name,
   account.customer_id,
   customer.name AS customer_name
-FROM transaction 
+FROM transaction
   INNER JOIN party ON transaction.party_id = party.id
   INNER JOIN vendor ON party.vendor_id = vendor.id
   INNER JOIN category ON party.category_id = category.id
@@ -118,13 +118,25 @@ ALTER TABLE account ADD FOREIGN KEY (customer_id) REFERENCES customer(id) ON UPD
 ALTER TABLE transaction ADD FOREIGN KEY (account_id) REFERENCES account(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE transaction ADD FOREIGN KEY (party_id) REFERENCES party(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE vendor ADD CONSTRAINT uc_vendor_key UNIQUE (_key);
+ALTER TABLE category ADD CONSTRAINT uc_category_key UNIQUE (_key);
+ALTER TABLE customer ADD CONSTRAINT uc_customer_key UNIQUE (_key);
+ALTER TABLE bank ADD CONSTRAINT uc_bank_key UNIQUE (_key);
+ALTER TABLE party ADD CONSTRAINT uc_party_key UNIQUE (_key);
+ALTER TABLE account ADD CONSTRAINT uc_account_key UNIQUE (_key);
+ALTER TABLE transaction ADD CONSTRAINT uc_transaction_key UNIQUE (_key);
+
 DELIMITER ;;
 
 CREATE TRIGGER before_insert_vendor
 BEFORE INSERT ON vendor
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_vendor
@@ -141,7 +153,11 @@ CREATE TRIGGER before_insert_category
 BEFORE INSERT ON category
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_category
@@ -158,7 +174,11 @@ CREATE TRIGGER before_insert_customer
 BEFORE INSERT ON customer
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_customer
@@ -175,7 +195,11 @@ CREATE TRIGGER before_insert_bank
 BEFORE INSERT ON bank
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_bank
@@ -192,7 +216,11 @@ CREATE TRIGGER before_insert_party
 BEFORE INSERT ON party
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_party
@@ -209,7 +237,11 @@ CREATE TRIGGER before_insert_account
 BEFORE INSERT ON account
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_account
@@ -226,7 +258,11 @@ CREATE TRIGGER before_insert_transaction
 BEFORE INSERT ON transaction
 FOR EACH ROW
 BEGIN
-  SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  IF new._key IS NOT NULL THEN
+    SET new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  ELSE
+    SET new._key = UUID(), new._version = UUID(), new._created = CURRENT_TIMESTAMP, new._updated = CURRENT_TIMESTAMP;
+  END IF;
 END
 ;;
 CREATE TRIGGER before_update_transaction
@@ -268,4 +304,3 @@ INSERT INTO transaction (trans_date, check_num, description, memo, amount, party
 ('2019-02-24 22:15:10', '', 'payment 10000002', '', 473.32, 3, 2),
 ('2019-01-24 22:15:10', '', 'payment 10000001', '', 473.32, 3, 2),
 ('2019-01-23 22:15:10', '2322', 'plummer', 'frozen pipes', -243.94, 1, 3);
-

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryResource {
 
 	@Autowired
-	private SimpleDAO<CategoryResult, CategoryRequestParams, String> dao;
+	private SimpleDAO<CategoryResult, CategoryRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public CategoryResult get(@PathVariable String id) {

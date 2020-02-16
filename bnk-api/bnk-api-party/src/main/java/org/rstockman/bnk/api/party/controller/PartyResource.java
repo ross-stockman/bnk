@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartyResource {
 
 	@Autowired
-	private SimpleDAO<PartyResult, PartyRequestParams, String> dao;
+	private SimpleDAO<PartyResult, PartyRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public PartyResult getParty(@PathVariable String id) {

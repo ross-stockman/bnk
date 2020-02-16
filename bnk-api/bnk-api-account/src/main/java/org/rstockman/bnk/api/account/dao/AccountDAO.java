@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AccountDAO implements SimpleDAO<AccountResult, AccountRequestParams, String> {
+public class AccountDAO implements SimpleDAO<AccountResult, AccountRequestParams, String, String> {
 
 	private static final Map<String, AccountResult> MAP = new HashMap<>();
 
@@ -60,6 +60,17 @@ public class AccountDAO implements SimpleDAO<AccountResult, AccountRequestParams
 
 	@Override
 	public void put(String key, AccountResult obj) {
+		if (Objects.nonNull(obj.getCustomer())) {
+			customerRestClient.get(obj.getCustomer().getId());
+		}
+		if (Objects.nonNull(obj.getBank())) {
+			bankRestClient.get(obj.getBank().getId());
+		}
+		MAP.put(key, obj);
+	}
+
+	@Override
+	public void put(String key, String version, AccountResult obj) {
 		if (Objects.nonNull(obj.getCustomer())) {
 			customerRestClient.get(obj.getCustomer().getId());
 		}

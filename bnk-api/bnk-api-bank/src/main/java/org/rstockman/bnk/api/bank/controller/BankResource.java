@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BankResource {
 
 	@Autowired
-	private SimpleDAO<BankResult, BankRequestParams, String> dao;
+	private SimpleDAO<BankResult, BankRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public BankResult get(@PathVariable String id) {

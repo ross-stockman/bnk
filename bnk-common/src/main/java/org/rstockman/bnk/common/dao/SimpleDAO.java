@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.rstockman.bnk.common.dto.StandardRequestParamsDTO;
 import org.rstockman.bnk.common.dto.StandardResourceDTO;
 
-public interface SimpleDAO<T extends StandardResourceDTO, P extends StandardRequestParamsDTO, K> {
+public interface SimpleDAO<T extends StandardResourceDTO, P extends StandardRequestParamsDTO, K, V> {
 
 	Optional<T> get(K key);
 
@@ -15,6 +15,8 @@ public interface SimpleDAO<T extends StandardResourceDTO, P extends StandardRequ
 	K create(T obj);
 
 	void put(K key, T obj);
+
+	void put(K key, V version, T obj);
 
 	void delete(K key);
 }

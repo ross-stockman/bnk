@@ -40,6 +40,7 @@ services:
       - local
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
+      - lombok.anyConstructor.addConstructorProperties=true
     depends_on:
       - bnk-config
       - bnk-data

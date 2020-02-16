@@ -8,9 +8,15 @@
 - [ ] The `_key` column value cannot be modified once committed.
 - [ ] The `_version` column value must be system generated on initial insert.
 - [ ] The system must generate a new `_version` value upon any update to the table.
+- [ ] The `_version` column value must be regenerated on any records affected by a cascading update.
 - [ ] If the `_version` column is included in an update, the system must reject the update if the value does not match the existing value on the record being updated. [See Data Integrity and Concurrency Control](#Data-Integrity-and-Concurrency-Control)
 - [ ] The `_created` column value must be system generated on initial insert.
 - [ ] The `_created` column value cannot be modified once committed.
 - [ ] The `_updated` column value must be system generated on initial insert.
 - [ ] The system must generate a new `_updated` value upon any update to the table.
+- [ ] The `_updated` column value must be regenerated on any records affected by a cascading update.
+- [ ] Cascading deletes must not be allowed. [See Data Integrity and Concurrency Control](#Data-Integrity-and-Concurrency-Control)
+
 ##### Data Integrity and Concurrency Control
+- [ ] The system must prevent concurrent updates from overwriting each other.
+- [ ] The system must prevent deletions of resources that are still linked to or referenced by other resources.

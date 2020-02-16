@@ -1,34 +1,29 @@
 package org.rstockman.bnk.api.vendor.dao;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.tomcat.util.buf.StringUtils;
 import org.rstockman.bnk.api.vendor.dto.VendorRequestParams;
 import org.rstockman.bnk.api.vendor.dto.VendorResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
+import org.rstockman.bnk.common.service.KeyProvisionerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Repository
-@Slf4j
-public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams, String> {
-
-	private static final Map<String, VendorResource> MAP = new HashMap<>();
+public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams, String, String> {
 
 	private static final List<String> DEFAULT_COLUMNS = Arrays.asList("_key", "_version", "_created", "_updated", "id",
 			"name");
+
+	@Autowired
+	private KeyProvisionerService keyProvisioner;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -53,12 +48,13 @@ public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams,
 	public List<VendorResource> getAll(VendorRequestParams params) {
 		var columns = resolveColumns(params);
 		var sorts = resolveSorts(params);
-		var query = "select " + (StringUtils.join(columns)) + " from vendor" + sorts;
+		var pagination = resolvePagination(params);
+		var query = "select " + (String.join(",", columns)) + " from vendor" + sorts + pagination;
 		log.info(query);
 		return jdbcTemplate.query(query, (rs, rowNum) -> {
-			var builder = VendorResource.builder();
+			var obj = new VendorResource();
 			if (columns.contains("_key")) {
-				builder = builder.key(rs.getString("_key"));
+				obj..setKey(rs.getString("_key"));
 			}
 			if (columns.contains("_version")) {
 				builder = builder.version(rs.getString("_version"));
@@ -104,21 +100,36 @@ public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams,
 		}
 	}
 
+	private String resolvePagination(VendorRequestParams params) {
+		if (Objects.isNull(params.getPage()) && Objects.isNull(params.getLimit())) {
+			return " ";
+		} else {
+			return " LIMIT " + (Objects.isNull(params.getPage()) ? 0 : params.getPage()) + ","
+					+ (Objects.isNull(params.getLimit()) ? Integer.MAX_VALUE : params.getLimit()) + " ";
+		}
+	}
+
 	@Override
 	public String create(VendorResource obj) {
-		var key = UUID.randomUUID().toString();
-		MAP.put(key, obj);
+		var key = keyProvisioner.getKey();
+		jdbcTemplate.update("insert into vendor (_key, id, name) values (?,?,?)", key, obj.getId(), obj.getName());
 		return key;
 	}
 
 	@Override
 	public void put(String key, VendorResource obj) {
-		MAP.put(key, obj);
+		jdbcTemplate.update("update vendor set id = ?, name = ? where _key = ?", obj.getId(), obj.getName(), key);
+	}
+
+	@Override
+	public void put(String key, String version, VendorResource obj) {
+		jdbcTemplate.update("update vendor set id = ?, name = ?, _version = ? where _key = ?", obj.getId(),
+				obj.getName(), key, version);
 	}
 
 	@Override
 	public void delete(String key) {
-		MAP.remove(key);
+		jdbcTemplate.update("delete vendor where _key = ?", key);
 	}
 
 }

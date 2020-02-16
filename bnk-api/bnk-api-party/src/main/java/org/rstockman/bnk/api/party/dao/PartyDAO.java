@@ -19,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PartyDAO implements SimpleDAO<PartyResult, PartyRequestParams, String> {
+public class PartyDAO implements SimpleDAO<PartyResult, PartyRequestParams, String, String> {
 
 	private static final Map<String, PartyResult> MAP = new HashMap<>();
 
@@ -66,6 +66,17 @@ public class PartyDAO implements SimpleDAO<PartyResult, PartyRequestParams, Stri
 
 	@Override
 	public void put(String key, PartyResult obj) {
+		if (Objects.nonNull(obj.getCategory())) {
+			categoryRestClient.get(obj.getCategory().getId());
+		}
+		if (Objects.nonNull(obj.getVendor())) {
+			vendorRestClient.get(obj.getVendor().getId());
+		}
+		MAP.put(key, obj);
+	}
+
+	@Override
+	public void put(String key, String version, PartyResult obj) {
 		if (Objects.nonNull(obj.getCategory())) {
 			categoryRestClient.get(obj.getCategory().getId());
 		}

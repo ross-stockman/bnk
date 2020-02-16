@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class VendorController {
 
 	@Autowired
-	private SimpleDAO<VendorResource, VendorRequestParams, String> dao;
+	private SimpleDAO<VendorResource, VendorRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public VendorResource getVendor(@PathVariable String id) {

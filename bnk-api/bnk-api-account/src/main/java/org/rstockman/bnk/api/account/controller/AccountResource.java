@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountResource {
 
 	@Autowired
-	private SimpleDAO<AccountResult, AccountRequestParams, String> dao;
+	private SimpleDAO<AccountResult, AccountRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
 	public AccountResult getAccount(@PathVariable String id) {
