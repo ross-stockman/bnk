@@ -1,10 +1,11 @@
-package org.rstockman.bnk.api.account.controller;
+package org.rstockman.bnk.api.customer.controller;
 
 import java.util.List;
 
-import org.rstockman.bnk.api.account.dto.AccountRequestParams;
-import org.rstockman.bnk.api.account.dto.AccountResult;
+import org.rstockman.bnk.api.customer.dto.CustomerRequestParams;
+import org.rstockman.bnk.api.customer.dto.CustomerResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
+import org.rstockman.bnk.common.exceptions.ExceptionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,29 +17,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/accounts")
-public class AccountResource {
+@RequestMapping("/customers")
+public class CustomerController {
 
 	@Autowired
-	private SimpleDAO<AccountResult, AccountRequestParams, String, String> dao;
+	private SimpleDAO<CustomerResource, CustomerRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
-	public AccountResult getAccount(@PathVariable String id) {
-		return dao.get(id).get();
+	public CustomerResource get(@PathVariable String id) {
+		var obj = dao.get(id);
+		if (obj.isEmpty()) {
+			throw ExceptionFactory.resourceNotFound();
+		}
+		return obj.get();
 	}
 
 	@GetMapping
-	public List<AccountResult> getAll(AccountRequestParams params) {
+	public List<CustomerResource> getAll(CustomerRequestParams params) {
 		return dao.getAll(params);
 	}
 
 	@PostMapping
-	public String create(@RequestBody AccountResult obj) {
+	public String create(@RequestBody CustomerResource obj) {
 		return dao.create(obj);
 	}
 
 	@PutMapping("/{id}")
-	public void put(@PathVariable String key, @RequestBody AccountResult obj) {
+	public void put(@PathVariable String key, @RequestBody CustomerResource obj) {
 		dao.put(key, obj);
 	}
 

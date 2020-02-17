@@ -3,7 +3,7 @@ package org.rstockman.bnk.api.party.controller;
 import java.util.List;
 
 import org.rstockman.bnk.api.party.dto.PartyRequestParams;
-import org.rstockman.bnk.api.party.dto.PartyResult;
+import org.rstockman.bnk.api.party.dto.PartyResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,28 +17,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/parties")
-public class PartyResource {
+public class PartyController {
 
 	@Autowired
-	private SimpleDAO<PartyResult, PartyRequestParams, String, String> dao;
+	private SimpleDAO<PartyResource, PartyRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
-	public PartyResult getParty(@PathVariable String id) {
+	public PartyResource getParty(@PathVariable String id) {
 		return dao.get(id).get();
 	}
 
 	@GetMapping
-	public List<PartyResult> getAll(PartyRequestParams params) {
+	public List<PartyResource> getAll(PartyRequestParams params) {
 		return dao.getAll(params);
 	}
 
 	@PostMapping
-	public String create(@RequestBody PartyResult obj) {
+	public String create(@RequestBody PartyResource obj) {
 		return dao.create(obj);
 	}
 
 	@PutMapping("/{id}")
-	public void put(@PathVariable String key, @RequestBody PartyResult obj) {
+	public void put(@PathVariable String key, @RequestBody PartyResource obj) {
 		dao.put(key, obj);
 	}
 

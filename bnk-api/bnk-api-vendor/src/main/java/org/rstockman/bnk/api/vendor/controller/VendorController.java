@@ -42,12 +42,12 @@ public class VendorController {
 		return dao.create(obj);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("/{key}")
 	public void put(@PathVariable String key, @RequestBody VendorResource obj) {
 		dao.put(key, obj);
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{key}")
 	public void delete(@PathVariable String key) {
 		dao.delete(key);
 	}

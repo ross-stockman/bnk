@@ -10,6 +10,8 @@ import org.rstockman.bnk.api.vendor.dto.VendorRequestParams;
 import org.rstockman.bnk.api.vendor.dto.VendorResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
 import org.rstockman.bnk.common.service.KeyProvisionerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams, String, String> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(VendorDAO.class);
 
 	private static final List<String> DEFAULT_COLUMNS = Arrays.asList("_key", "_version", "_created", "_updated", "id",
 			"name");
@@ -31,15 +35,16 @@ public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams,
 	@Override
 	public Optional<VendorResource> get(String key) {
 		try {
-			return Optional.of(jdbcTemplate.queryForObject("select * from vendor where _key = ?", (rs, rowNum) -> {
-				return VendorResource.builder().key(rs.getString("_key")).version(rs.getString("_version"))
-						.created(rs.getTimestamp("_created")).updated(rs.getTimestamp("_updated")).id(rs.getLong("id"))
-						.name(rs.getString("name")).build();
-			}, key));
+			return Optional.of(jdbcTemplate.queryForObject(
+					"select " + String.join(",", DEFAULT_COLUMNS) + " from vendor where _key = ?", (rs, rowNum) -> {
+						return new VendorResource(rs.getLong("id"), rs.getString("name"), rs.getString("_key"),
+								rs.getString("_version"), rs.getTimestamp("_created"), rs.getTimestamp("_updated"));
+
+					}, key));
 		} catch (EmptyResultDataAccessException e) {
 			return Optional.empty();
 		} catch (IncorrectResultSizeDataAccessException e) {
-			log.warn("There should be 1 or 0 rows with this _key=" + key + " but more records were found.", e);
+			LOGGER.warn("There should be 1 or 0 rows with this _key=" + key + " but more records were found.", e);
 			return Optional.empty();
 		}
 	}
@@ -50,28 +55,28 @@ public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams,
 		var sorts = resolveSorts(params);
 		var pagination = resolvePagination(params);
 		var query = "select " + (String.join(",", columns)) + " from vendor" + sorts + pagination;
-		log.info(query);
+		LOGGER.debug(query);
 		return jdbcTemplate.query(query, (rs, rowNum) -> {
 			var obj = new VendorResource();
 			if (columns.contains("_key")) {
-				obj..setKey(rs.getString("_key"));
+				obj.setKey(rs.getString("_key"));
 			}
 			if (columns.contains("_version")) {
-				builder = builder.version(rs.getString("_version"));
+				obj.setVersion(rs.getString("_version"));
 			}
 			if (columns.contains("_created")) {
-				builder = builder.created(rs.getTimestamp("_created"));
+				obj.setCreated(rs.getTimestamp("_created"));
 			}
 			if (columns.contains("_updated")) {
-				builder = builder.updated(rs.getTimestamp("_updated"));
+				obj.setUpdated(rs.getTimestamp("_updated"));
 			}
 			if (columns.contains("id")) {
-				builder = builder.id(rs.getLong("id"));
+				obj.setId(rs.getLong("id"));
 			}
 			if (columns.contains("name")) {
-				builder = builder.name(rs.getString("name"));
+				obj.setName(rs.getString("name"));
 			}
-			return builder.build();
+			return obj;
 		});
 	}
 
@@ -129,7 +134,7 @@ public class VendorDAO implements SimpleDAO<VendorResource, VendorRequestParams,
 
 	@Override
 	public void delete(String key) {
-		jdbcTemplate.update("delete vendor where _key = ?", key);
+		jdbcTemplate.update("delete from vendor where _key = ?", key);
 	}
 
 }

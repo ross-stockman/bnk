@@ -1,87 +1,145 @@
 package org.rstockman.bnk.api.transaction.dao;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-import org.rstockman.bnk.api.transaction.dto.Account;
-import org.rstockman.bnk.api.transaction.dto.Party;
 import org.rstockman.bnk.api.transaction.dto.TransactionRequestParams;
-import org.rstockman.bnk.api.transaction.dto.TransactionResult;
+import org.rstockman.bnk.api.transaction.dto.TransactionResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
-import org.rstockman.bnk.common.rest.SimpleRestClient;
+import org.rstockman.bnk.common.service.KeyProvisionerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TransactionDAO implements SimpleDAO<TransactionResult, TransactionRequestParams, String, String> {
+public class TransactionDAO implements SimpleDAO<TransactionResource, TransactionRequestParams, String, String> {
 
-	private static final Map<String, TransactionResult> MAP = new HashMap<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(TransactionDAO.class);
 
-	@Value("${bnk.api.account.uri}")
-	private String accountUrl;
-
-	@Value("${bnk.api.party.uri}")
-	private String partyUrl;
+	private static final List<String> DEFAULT_COLUMNS = Arrays.asList("_key", "_version", "_created", "_updated", "id",
+			"description");
 
 	@Autowired
-	private SimpleRestClient<Account, String> accountRestClient;
+	private KeyProvisionerService keyProvisioner;
 
 	@Autowired
-	private SimpleRestClient<Party, String> partyRestClient;
+	private JdbcTemplate jdbcTemplate;
 
 	@Override
-	public Optional<TransactionResult> get(String key) {
-		return Optional.ofNullable(MAP.get(key));
+	public Optional<TransactionResource> get(String key) {
+		try {
+			return Optional.of(jdbcTemplate.queryForObject(
+					"select " + String.join(",", DEFAULT_COLUMNS) + " from transaction where _key = ?",
+					(rs, rowNum) -> {
+						return new TransactionResource(rs.getLong("id"), rs.getString("description"),
+								rs.getString("memo"), rs.getString("check_num"), rs.getTimestamp("trans_date"), null,
+								null, rs.getDouble("amount"), rs.getString("_key"), rs.getString("_version"),
+								rs.getTimestamp("_created"), rs.getTimestamp("_updated"));
+
+					}, key));
+		} catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		} catch (IncorrectResultSizeDataAccessException e) {
+			LOGGER.warn("There should be 1 or 0 rows with this _key=" + key + " but more records were found.", e);
+			return Optional.empty();
+		}
 	}
 
 	@Override
-	public List<TransactionResult> getAll(TransactionRequestParams params) {
-		return new ArrayList<TransactionResult>();
+	public List<TransactionResource> getAll(TransactionRequestParams params) {
+		var columns = resolveColumns(params);
+		var sorts = resolveSorts(params);
+		var pagination = resolvePagination(params);
+		var query = "select " + (String.join(",", columns)) + " from transaction" + sorts + pagination;
+		LOGGER.debug(query);
+		return jdbcTemplate.query(query, (rs, rowNum) -> {
+			var obj = new TransactionResource();
+			if (columns.contains("_key")) {
+				obj.setKey(rs.getString("_key"));
+			}
+			if (columns.contains("_version")) {
+				obj.setVersion(rs.getString("_version"));
+			}
+			if (columns.contains("_created")) {
+				obj.setCreated(rs.getTimestamp("_created"));
+			}
+			if (columns.contains("_updated")) {
+				obj.setUpdated(rs.getTimestamp("_updated"));
+			}
+			if (columns.contains("id")) {
+				obj.setId(rs.getLong("id"));
+			}
+			if (columns.contains("description")) {
+				obj.setDescription(rs.getString("description"));
+			}
+			return obj;
+		});
+	}
+
+	private List<String> resolveColumns(TransactionRequestParams params) {
+		if (Objects.isNull(params.getFields())) {
+			return DEFAULT_COLUMNS;
+		} else {
+			return Arrays.asList(params.getFields().trim().split("\\s*,\\s*"));
+		}
+	}
+
+	private String resolveSorts(TransactionRequestParams params) {
+		if (Objects.isNull(params.getSort())) {
+			return " ";
+		} else {
+			return " ORDER BY "
+					+ String.join(",", Arrays.asList(params.getSort().trim().split("\\s*,\\s*")).stream().map(s -> {
+						if (s.startsWith("-")) {
+							return s.substring(1) + " DESC ";
+						} else if (s.startsWith("+")) {
+							return s.substring(1) + " ASC ";
+						} else {
+							return s;
+						}
+					}).collect(Collectors.toList()));
+		}
+	}
+
+	private String resolvePagination(TransactionRequestParams params) {
+		if (Objects.isNull(params.getPage()) && Objects.isNull(params.getLimit())) {
+			return " ";
+		} else {
+			return " LIMIT " + (Objects.isNull(params.getPage()) ? 0 : params.getPage()) + ","
+					+ (Objects.isNull(params.getLimit()) ? Integer.MAX_VALUE : params.getLimit()) + " ";
+		}
 	}
 
 	@Override
-	public String create(TransactionResult obj) {
-		if (Objects.nonNull(obj.getParty())) {
-			partyRestClient.get(obj.getParty().getId());
-		}
-		if (Objects.nonNull(obj.getAccount())) {
-			accountRestClient.get(obj.getAccount().getId());
-		}
-		var key = UUID.randomUUID().toString();
-		MAP.put(key, obj);
+	public String create(TransactionResource obj) {
+		var key = keyProvisioner.getKey();
+		jdbcTemplate.update("insert into transaction (_key, id, description) values (?,?,?)", key, obj.getId(),
+				obj.getDescription());
 		return key;
 	}
 
 	@Override
-	public void put(String key, TransactionResult obj) {
-		if (Objects.nonNull(obj.getParty())) {
-			partyRestClient.get(obj.getParty().getId());
-		}
-		if (Objects.nonNull(obj.getAccount())) {
-			accountRestClient.get(obj.getAccount().getId());
-		}
-		MAP.put(key, obj);
+	public void put(String key, TransactionResource obj) {
+		jdbcTemplate.update("update transaction set id = ?, description = ? where _key = ?", obj.getId(),
+				obj.getDescription(), key);
 	}
 
 	@Override
-	public void put(String key, String version, TransactionResult obj) {
-		if (Objects.nonNull(obj.getParty())) {
-			partyRestClient.get(obj.getParty().getId());
-		}
-		if (Objects.nonNull(obj.getAccount())) {
-			accountRestClient.get(obj.getAccount().getId());
-		}
-		MAP.put(key, obj);
+	public void put(String key, String version, TransactionResource obj) {
+		jdbcTemplate.update("update transaction set id = ?, description = ?, _version = ? where _key = ?", obj.getId(),
+				obj.getDescription(), key, version);
 	}
 
 	@Override
 	public void delete(String key) {
-		MAP.remove(key);
+		jdbcTemplate.update("delete from transaction where _key = ?", key);
 	}
+
 }

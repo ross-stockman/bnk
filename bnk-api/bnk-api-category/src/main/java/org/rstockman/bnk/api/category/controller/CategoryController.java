@@ -3,7 +3,7 @@ package org.rstockman.bnk.api.category.controller;
 import java.util.List;
 
 import org.rstockman.bnk.api.category.dto.CategoryRequestParams;
-import org.rstockman.bnk.api.category.dto.CategoryResult;
+import org.rstockman.bnk.api.category.dto.CategoryResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
 import org.rstockman.bnk.common.exceptions.ExceptionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/categories")
-public class CategoryResource {
+public class CategoryController {
 
 	@Autowired
-	private SimpleDAO<CategoryResult, CategoryRequestParams, String, String> dao;
+	private SimpleDAO<CategoryResource, CategoryRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
-	public CategoryResult get(@PathVariable String id) {
+	public CategoryResource get(@PathVariable String id) {
 		var obj = dao.get(id);
 		if (obj.isEmpty()) {
 			throw ExceptionFactory.resourceNotFound();
@@ -33,17 +33,17 @@ public class CategoryResource {
 	}
 
 	@GetMapping
-	public List<CategoryResult> getAll(CategoryRequestParams params) {
+	public List<CategoryResource> getAll(CategoryRequestParams params) {
 		return dao.getAll(params);
 	}
 
 	@PostMapping
-	public String create(@RequestBody CategoryResult obj) {
+	public String create(@RequestBody CategoryResource obj) {
 		return dao.create(obj);
 	}
 
 	@PutMapping("/{id}")
-	public void put(@PathVariable String key, @RequestBody CategoryResult obj) {
+	public void put(@PathVariable String key, @RequestBody CategoryResource obj) {
 		dao.put(key, obj);
 	}
 

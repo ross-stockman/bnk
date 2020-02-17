@@ -1,4 +1,4 @@
-package org.rstockman.bnk.api.vendor.dto;
+package org.rstockman.bnk.api.party.dto;
 
 import java.util.Date;
 
@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class VendorResource extends StandardResourceDTO {
+public class PartyResource extends StandardResourceDTO {
 	private Long id;
 	private String name;
 
-	public VendorResource() {
+	public PartyResource() {
 		super();
 	}
 
-	public VendorResource(Long id, String name, String key, String version, Date created, Date updated) {
+	public PartyResource(Long id, String name, String key, String version, Date created, Date updated) {
 		super();
 		this.id = id;
 		this.name = name;

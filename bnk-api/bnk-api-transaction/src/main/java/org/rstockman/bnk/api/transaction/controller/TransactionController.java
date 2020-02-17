@@ -1,11 +1,10 @@
-package org.rstockman.bnk.api.customer.controller;
+package org.rstockman.bnk.api.transaction.controller;
 
 import java.util.List;
 
-import org.rstockman.bnk.api.customer.dto.CustomerRequestParams;
-import org.rstockman.bnk.api.customer.dto.CustomerResult;
+import org.rstockman.bnk.api.transaction.dto.TransactionRequestParams;
+import org.rstockman.bnk.api.transaction.dto.TransactionResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
-import org.rstockman.bnk.common.exceptions.ExceptionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,33 +16,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/customers")
-public class CustomerResource {
+@RequestMapping("/transactions")
+public class TransactionController {
 
 	@Autowired
-	private SimpleDAO<CustomerResult, CustomerRequestParams, String, String> dao;
+	private SimpleDAO<TransactionResource, TransactionRequestParams, String, String> dao;
 
 	@GetMapping("/{id}")
-	public CustomerResult get(@PathVariable String id) {
-		var obj = dao.get(id);
-		if (obj.isEmpty()) {
-			throw ExceptionFactory.resourceNotFound();
-		}
-		return obj.get();
+	public TransactionResource getTransaction(@PathVariable String id) {
+		return dao.get(id).get();
 	}
 
 	@GetMapping
-	public List<CustomerResult> getAll(CustomerRequestParams params) {
+	public List<TransactionResource> getAll(TransactionRequestParams params) {
 		return dao.getAll(params);
 	}
 
 	@PostMapping
-	public String create(@RequestBody CustomerResult obj) {
+	public String create(@RequestBody TransactionResource obj) {
 		return dao.create(obj);
 	}
 
 	@PutMapping("/{id}")
-	public void put(@PathVariable String key, @RequestBody CustomerResult obj) {
+	public void put(@PathVariable String key, @RequestBody TransactionResource obj) {
 		dao.put(key, obj);
 	}
 
