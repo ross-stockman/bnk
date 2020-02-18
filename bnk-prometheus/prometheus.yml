@@ -1,0 +1,47 @@
+global:
+  scrape_interval: 5s
+  
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['bnk-prometheus:9090']
+#  - job_name: bnk-config
+#    metrics_path: /actuator/prometheus
+#    scrape_interval: 5s
+#    static_configs:
+#      - targets: ['bnk-config:8080']
+  - job_name: bnk-api-vendor
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-vendor:8080']
+  - job_name: bnk-api-category
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-category:8080']
+  - job_name: bnk-api-party
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-party:8080']
+  - job_name: bnk-api-customer
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-customer:8080']
+  - job_name: bnk-api-bank
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-bank:8080']
+  - job_name: bnk-api-account
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-account:8080']
+  - job_name: bnk-api-transaction
+    metrics_path: /actuator/prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['bnk-api-transaction:8080']

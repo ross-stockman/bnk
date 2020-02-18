@@ -1,5 +1,25 @@
 version: "3"
 services:
+  bnk-prometheus:
+    container_name: bnk-prometheus
+    build: ./bnk-prometheus
+    restart: always
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    networks:
+      - local
+  bnk-grafanas:
+    container_name: bnk-grafanas
+    image: grafana/grafana
+    restart: always
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    networks:
+      - local
   bnk-data:
     container_name: bnk-data
     build: ./bnk-data
