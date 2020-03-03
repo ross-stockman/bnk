@@ -1,28 +1,36 @@
 version: "3"
 services:
-  bnk-prometheus:
-    container_name: bnk-prometheus
-    build: ./bnk-prometheus
+  bnk-config:
+    container_name: bnk-config
+    build: ./bnk-config
     restart: always
     expose:
-      - 9090
+      - 8888
     ports:
-      - 9090:9090
+      - 8888:8080
     networks:
-      - local
-  bnk-grafanas:
-    container_name: bnk-grafanas
-    image: grafana/grafana
+      - applocal
+    environment:
+      - spring.cloud.config.server.git.uri=https://github.com/ross-stockman/demo-config.git
+  bnk-data-auth:
+    container_name: bnk-data-auth
+    build: ./bnk-data-auth
     restart: always
-    expose:
-      - 3000
     ports:
-      - 3000:3000
+    - 3307:3306
+    environment:
+      MYSQL_DATABASE: auth
+      MYSQL_USER: trucker
+      MYSQL_PASSWORD: trucker
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - bnk-data-auth:/var/lib/mysql
     networks:
-      - local
-  bnk-data:
-    container_name: bnk-data
-    build: ./bnk-data
+      - authlocal
+  bnk-data-app:
+    container_name: bnk-data-app
+    build: ./bnk-data-app
     restart: always
     ports:
       - 3306:3306
@@ -33,9 +41,29 @@ services:
       MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - db-data:/var/lib/mysql
+      - bnk-data-app:/var/lib/mysql
     networks:
-      - local
+      - applocal
+  bnk-prometheus:
+    container_name: bnk-prometheus
+    build: ./bnk-prometheus
+    restart: always
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    networks:
+      - applocal
+  bnk-grafanas:
+    container_name: bnk-grafanas
+    image: grafana/grafana
+    restart: always
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    networks:
+      - applocal
   bnk-config:
     container_name: bnk-config
     build: ./bnk-config
@@ -45,7 +73,7 @@ services:
     ports:
       - 8888:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.server.git.uri=https://github.com/ross-stockman/demo-config.git
   bnk-api-vendor:
@@ -57,13 +85,13 @@ services:
     ports:
       - 8081:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
       - lombok.anyConstructor.addConstructorProperties=true
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
   bnk-api-category:
     container_name: bnk-api-category
     build: ./bnk-api/bnk-api-category
@@ -73,12 +101,12 @@ services:
     ports:
       - 8082:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
   bnk-api-party:
     container_name: bnk-api-party
     build: ./bnk-api/bnk-api-party
@@ -88,12 +116,12 @@ services:
     ports:
       - 8083:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
       - bnk-api-vendor
       - bnk-api-category
   bnk-api-customer:
@@ -105,12 +133,12 @@ services:
     ports:
       - 8084:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
   bnk-api-bank:
     container_name: bnk-api-bank
     build: ./bnk-api/bnk-api-bank
@@ -120,12 +148,12 @@ services:
     ports:
       - 8085:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
   bnk-api-account:
     container_name: bnk-api-account
     build: ./bnk-api/bnk-api-account
@@ -135,12 +163,12 @@ services:
     ports:
       - 8086:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
       - bnk-api-customer
       - bnk-api-bank
   bnk-api-transaction:
@@ -152,16 +180,19 @@ services:
     ports:
       - 8087:8080
     networks:
-      - local
+      - applocal
     environment:
       - spring.cloud.config.uri=http://bnk-config:8080
     depends_on:
       - bnk-config
-      - bnk-data
+      - bnk-data-app
       - bnk-api-party
       - bnk-api-account
 volumes:
-  db-data:
+  bnk-data-app:
+  bnk-data-auth:
 networks:
-  local:
+  applocal:
+    driver: bridge
+  authlocal:
     driver: bridge
