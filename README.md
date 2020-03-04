@@ -1,4 +1,5 @@
-# bnk
+# bnk-fullstack
+My sandbox project for fullstack development, tutorials, and self training
 ## Docker
 All components in this fullstack application are run by a single `docker-compose up` command
 ## Stacks
