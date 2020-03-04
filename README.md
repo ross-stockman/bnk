@@ -1,4 +1,25 @@
 # bnk
+## Docker
+All components in this fullstack application are run by a single `docker-compose up` command
+## Stacks
+##### bnk-api
+Spring boot rest api micro services
+##### bnk-data
+MySql backend databases, includes table ddl, triggers, stored procedures, and mock data. Used by api and for user auth (TODO)
+##### bnk-config
+Spring cloud config server reads properties from github as backend source
+##### bnk-prometheus
+Metrics scraping
+##### bnk-grafana
+Metrics dashboard
+##### bnk-authenticate
+TODO: Spring security for rest api access
+##### bnk-web
+TODO: Some kind of front end view layer
+##### bnk-zookeeper
+MAYBE: If I find a use case for it
+##### bnk-batch
+MAYBE: If I find a use case to add some spring batch component. This might be split into multiple components.
 ## Requirements
 ##### Database Tables
 - [ ] Each table must have the following four standard watermark columns: `_key`, `_version`, `_created`, `_updated`
