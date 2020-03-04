@@ -20,6 +20,19 @@ TODO: Some kind of front end view layer
 MAYBE: If I find a use case for it
 ##### bnk-batch
 MAYBE: If I find a use case to add some spring batch component. This might be split into multiple components.
+##### bnk-messaging
+MAYBE: Some kind of queue or pub/sub component, might work with batching component
+## TODO
+* Automated build - Travis CI
+* Junit5
+* Service discovery
+* Hystrix - fault tolerance
+* RxJava - asynchronous calls to backend services
+* Functional rest api controllers
+* Export/Import grafana dashboard
+* HTTPS
+* Traffic simulation (jmeter?)
+
 ## Requirements
 ##### Database Tables
 - [ ] Each table must have the following four standard watermark columns: `_key`, `_version`, `_created`, `_updated`
