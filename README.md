@@ -27,7 +27,7 @@ MAYBE: Some kind of queue or pub/sub component, might work with batching compone
 * Automated build - Travis CI
 * Junit5
 * Service discovery
-* Hystrix - fault tolerance
+* Hystrix + Turbine - fault tolerance
 * RxJava - asynchronous calls to backend services
 * Functional rest api controllers
 * Export/Import grafana dashboard
