@@ -1,5 +1,5 @@
 # bnk-fullstack
-My sandbox project for fullstack development, tutorials, and self training
+My sandbox project for fullstack development, tutorials, and self training. It would be fun to see how many tech stacks I can start up with a single command :thinking: ...
 ## Docker
 All components in this fullstack application are run by a single `docker-compose up` command
 ## Stacks
