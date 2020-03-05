@@ -1,5 +1,7 @@
-# bnk-fullstack
+# bnk-fullstack-sandbox
 My sandbox project for fullstack development, tutorials, and self training. It would be fun to see how many tech stacks I can start up with a single command :thinking: ...
+
+What is `bnk`? Just a made up abbreviation for 'bank'. This bank data model actually comes from a project I worked on in college back in the mid 2000's. I always use this same data model when I work on these kinds of sandbox projects because it's simple but there's a lot I can do with it when I put my mind to it. This project is not intended to be a fully implemented application. It's just a collection of sample projects that I have experimented with over time. However, I try to add enough foundation that these project _could_ be completed in a somewhat realistic fullstack application.
 ## Docker
 All components in this fullstack application are run by a single `docker-compose up` command
 ## Stacks
