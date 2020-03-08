@@ -1,7 +1,10 @@
 package org.rstockman.bnk.api.vendor.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.rstockman.bnk.api.vendor.dto.VendorRequestParams;
 import org.rstockman.bnk.api.vendor.dto.VendorResource;
 import org.rstockman.bnk.common.dao.SimpleDAO;
@@ -33,8 +36,18 @@ public class VendorController {
 	}
 
 	@GetMapping
+	@HystrixCommand(fallbackMethod = "getAllFallback", commandProperties = {
+		@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "5000"),
+		@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2"),
+		@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+		@HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "10000")
+	})
 	public List<VendorResource> getAll(VendorRequestParams params) {
 		return dao.getAll(params);
+	}
+
+	public List<VendorResource> getAllFallback(VendorRequestParams params) {
+		return new ArrayList<>();
 	}
 
 	@PostMapping
@@ -51,4 +64,5 @@ public class VendorController {
 	public void delete(@PathVariable String key) {
 		dao.delete(key);
 	}
+
 }

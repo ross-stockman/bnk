@@ -12,22 +12,22 @@ services:
       - applocal
     environment:
       - spring.cloud.config.server.git.uri=https://github.com/ross-stockman/demo-config.git
-  bnk-data-auth:
-    container_name: bnk-data-auth
-    build: ./bnk-data-auth
-    restart: always
-    ports:
-    - 3307:3306
-    environment:
-      MYSQL_DATABASE: auth
-      MYSQL_USER: trucker
-      MYSQL_PASSWORD: trucker
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - bnk-data-auth:/var/lib/mysql
-    networks:
-      - authlocal
+#  bnk-data-auth:
+#    container_name: bnk-data-auth
+#    build: ./bnk-data-auth
+#    restart: always
+#    ports:
+#    - 3307:3306
+#    environment:
+#      MYSQL_DATABASE: auth
+#      MYSQL_USER: trucker
+#      MYSQL_PASSWORD: trucker
+#      MYSQL_ROOT_USER: root
+#      MYSQL_ROOT_PASSWORD: root
+#    volumes:
+#      - bnk-data-auth:/var/lib/mysql
+#    networks:
+#      - authlocal
   bnk-data-app:
     container_name: bnk-data-app
     build: ./bnk-data-app
