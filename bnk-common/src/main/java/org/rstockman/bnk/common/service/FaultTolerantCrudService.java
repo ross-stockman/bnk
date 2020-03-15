@@ -25,4 +25,5 @@ public interface FaultTolerantCrudService<T extends StandardResourceDTO, P exten
 
     void delete(K key);
     void deleteFallback(K key);
+
 }

@@ -8,9 +8,6 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 	<artifactId>bnk-config</artifactId>
-	<properties>
-		<spring-cloud.version>Hoxton.SR1</spring-cloud.version>
-	</properties>
 
 	<dependencies>
 		<dependency>

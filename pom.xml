@@ -17,6 +17,7 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<spring-cloud.version>Hoxton.SR1</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -53,5 +54,8 @@
 		<module>bnk-common</module>
 		<module>bnk-config</module>
 		<module>bnk-api</module>
+		<module>bnk-discovery</module>
+		<module>bnk-service</module>
+		<module>bnk-gateway</module>
 	</modules>
 </project>
